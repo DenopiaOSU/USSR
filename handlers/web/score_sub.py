@@ -41,19 +41,26 @@ async def score_submit_handler(req: Request) -> Response:
 
     post_args = await req.form()
 
+    info("SubmitScoreHandler called! Submitting score now...")
+
     s = await Score.from_score_sub(post_args)
 
+    info("Score: %s" % str(s))
+
     # Check if theyre online, if not, force the client to wait to log in.
-    if not await check_online(s.user_id): 
-        return PlainTextResponse("")
+    #if not await check_online(s.user_id): 
+    #    info("Client is not online, returning plaintextresponse and waiting to logon..")
+    #    return PlainTextResponse("")
 
     privs = await caches.priv.get_privilege(s.user_id)
     if not s:
         error("Could not perform score sub! Check messages above!")
+        info("Score doesnt exist!")
         return PlainTextResponse("error: no")
     
     if not s.bmap:
         error("Score sub failed due to no beatmap being attached.")
+        info("no beatmap attached because peppy is a fucking burned cabbage or user is just retarded")
         return PlainTextResponse("error: no")
     
     if not s.mods.rankable():
@@ -61,6 +68,7 @@ async def score_submit_handler(req: Request) -> Response:
         return PlainTextResponse("error: no")
     
     if not await caches.password.check_password(s.user_id, post_args["pass"]):
+        info("umm what? (invalid password cache error or something idk man)")
         return PlainTextResponse("error: pass")
     
     # Anticheat checks.
@@ -68,7 +76,7 @@ async def score_submit_handler(req: Request) -> Response:
         await edit_user(Actions.RESTRICT, s.user_id, "Tampering with osu!auth")
     
     if req.headers.get("User-Agent") != "osu!":
-        await edit_user(Actions.RESTRICT, s.user_id, "Score submitter.")
+        await edit_user(Actions.RESTRICT, s.user_id, "Score .")
     
     if s.mods.conflict():
         await edit_user(Actions.RESTRICT, s.user_id, "Illegal mod combo (score submitter).")
@@ -95,6 +103,7 @@ async def score_submit_handler(req: Request) -> Response:
 
     if s.passed:
         debug("Fetching previous best to compare.")
+        info("fetching best score")
         prev_db = await connections.sql.fetchone(
             f"SELECT id FROM {stats.c_mode.db_table} WHERE userid = %s AND "
             f"beatmap_md5 = %s AND completed = 3 AND play_mode = {s.mode.value} LIMIT 1",
@@ -106,18 +115,19 @@ async def score_submit_handler(req: Request) -> Response:
         ) if prev_db else None
 
     debug("Submitting score...")
+    info("Actually finially fucking submitting score jesus fucking christ")
 
 
     await s.submit(
         restricted= privs & Privileges.USER_PUBLIC == 0
     )
 
-    debug("Incrementing bmap playcount.")
+    info("Incrementing bmap playcount.")
     await s.bmap.increment_playcount(s.passed)
     await increment_playtime(s.user_id, s.noncomputed_playtime, s.mode, s.c_mode)
 
     # Stat updates
-    debug("Updating stats.")
+    info("Updating stats.")
     stats.playcount += 1
     stats.total_score += s.score
     stats.total_hits += (s.count_300 + s.count_100 + s.count_50)
@@ -130,19 +140,19 @@ async def score_submit_handler(req: Request) -> Response:
         if s.bmap.status == Status.RANKED: stats.ranked_score += add_score   
         if stats.max_combo < s.max_combo: stats.max_combo = s.max_combo
         if s.completed == Completed.BEST and s.pp:
-            debug("Performing PP recalculation.")
+            info("Performing PP recalculation.")
             await stats.calc_pp_acc_full(s.pp)
-    debug("Saving stats")
+    info("Saving stats")
     await stats.save()
 
     # Write replay + anticheat.
     replay = await post_args.getlist("score")[1].read()
     if replay and replay != b"\r\n" and not s.passed:
         await edit_user(Actions.RESTRICT, s.user_id, "Score submit without replay "
-                                                     "(always should contain it).")
+                                                     "(always should contain it). stop cheating dipshit")
     
     if s.passed:
-        debug("Writing replay.")
+        info("Writing replay.")
         await write_replay(s.id, replay, s.c_mode)
 
     info(f"User {s.username} has submitted a #{s.placement} place"

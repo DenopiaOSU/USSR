@@ -154,7 +154,7 @@ def server_start():
     """Handles a regular start of the server."""
 
     app = Starlette(
-        debug= DEBUG,
+        debug=True,
         on_startup= [
             perform_startup
         ],

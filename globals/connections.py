@@ -39,7 +39,7 @@ async def connect_redis() -> bool:
     """
 
     try:
-        redis._pool_or_conn = await aioredis.create_pool("redis://localhost")
+        redis._pool_or_conn = await aioredis.create_pool(address="redis://localhost/", db=1)
         return True
     except Exception:
         error(f"There has been an exception connecting to the Redis database!\n" 

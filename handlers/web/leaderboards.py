@@ -98,6 +98,7 @@ async def leaderboard_get_handler(req: Request) -> Response:
         debug(f"{username} failed to authenticate!")
         return PlainTextResponse(PASS_ERR)
 
+    info(str(req))
     # Grab request args.
     md5 = req.query_params["c"]
     mods = Mods(int(req.query_params["mods"]))
