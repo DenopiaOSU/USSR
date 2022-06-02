@@ -105,8 +105,8 @@ class Webhook:
     def __init__(self, url: str, **kwargs) -> None:
         self.url = url
         self.content = kwargs.get('content')
-        self.username = kwargs.get('username')
-        self.avatar_url = kwargs.get('avatar_url')
+        self.username = "Miku!"
+        self.avatar_url = "https://cdn.discordapp.com/avatars/980583915083415562/2d0354f933445c1958a98a7e94025ef6.webp"
         self.tts = kwargs.get('tts')
         self.file = kwargs.get('file')
         self.embeds: list[Embed] = kwargs.get('embeds', [])
@@ -171,7 +171,6 @@ async def wrap_hook(hook: str, embed: Embed) -> None:
         wh = Webhook(
             hook,
             tts= False,
-            username= "USSR Score Server"
         )
         wh.add_embed(embed)
         await wh.post()
@@ -195,7 +194,7 @@ async def log_user_edit(user_id: int, username: str, action: Actions, reason: st
     embed = Embed(title="User Edited!", color=EDIT_COL)
     embed.description = (f"{username} ({user_id}) has just been {action.log_action}"
                         f" for {reason}!")
-    embed.set_author(name="USSR Score Server", icon_url=EDIT_ICON)
+    embed.set_author(name="Miku!", icon_url=EDIT_ICON)
     embed.set_footer(text= "This is an automated action performed by the server.")
 
     await schedule_hook(admin_hook, embed)
@@ -207,7 +206,7 @@ async def log_first_place(s: 'Score', old_stats: 'Stats', new_stats: 'Stats') ->
 
     # Heavily inspired by Ainu's webhook style.
     embed = Embed(color=0x0f97ff)
-    embed.set_footer(text= "USSR Score Server")
+    embed.set_footer(text= "Miku! Automatic Score Announcements")
     embed.set_author(name= f"[{s.c_mode.acronym}] New #1 score set by {s.username}!")
     embed.add_field(name=f'Score pp: {s.pp:.2f}pp', value=f'Gained: {pp_gained:.2f}pp' if pp_gained >= 0 else f'Lost: {pp_gained:.2f}pp')
     embed.add_field(name=f'Global Rank: {new_stats.rank}', value=f'[__[Download Map]({config.SRV_URL}/d/{s.bmap.set_id})__]')
