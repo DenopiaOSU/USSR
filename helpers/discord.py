@@ -209,8 +209,8 @@ async def log_first_place(s: 'Score', old_stats: 'Stats', new_stats: 'Stats') ->
     embed.set_footer(text= "Miku! Automatic Score Announcements")
     embed.set_author(name= f"[{s.c_mode.acronym}] New #1 score set by {s.username}!")
     embed.add_field(name=f'Score pp: {s.pp:.2f}pp', value=f'Gained: {pp_gained:.2f}pp' if pp_gained >= 0 else f'Lost: {pp_gained:.2f}pp')
-    embed.add_field(name=f'Global Rank: {new_stats.rank}', value=f'[__[Download Map]({config.SRV_URL}/d/{s.bmap.set_id})__]')
-    embed.add_field(name=f'Played by: {s.username}', value=f"[__[User Profile]({config.SRV_URL}/u/{s.user_id})__]")
+    embed.add_field(name=f'Global Rank: {new_stats.rank}', value=f'[__[Download Map](https://denopia.ml/d/{s.bmap.set_id})__]')
+    embed.add_field(name=f'Played by: {s.username}', value=f"[__[User Profile](https://denopia.ml/u/{s.user_id})__]")
 
     embed.set_image(url= f"https://assets.ppy.sh/beatmaps/{s.bmap.set_id}/covers/cover.jpg")
 
